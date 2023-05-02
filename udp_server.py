@@ -15,6 +15,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
     udp_server_socket.bind((local_ip, local_port))
     print("MUGIC_Mindstorms UDP server up and listening")
     jolt_count = 0
+    jolt_switch = False
 
     # Listen for incoming datagrams
     while True:
@@ -30,8 +31,12 @@ def startServer(local_ip, local_port, buffer_size=2048):
             received = UDPIntDecode(message)
             print("Message from Max:{}".format(received))
         if message.startswith(b'jolt'):
-            jolt_count += 1
-            print("Jolt from Max:{}".format(jolt_count))
+            if not jolt_switch:
+                jolt_switch = True
+            else:
+                jolt_count += 1
+                print("Jolt from Max:{}".format(jolt_count))
+                jolt_switch = False
         else:
             received = UDPStrDecode(message)
             print("Unrecognized Message from Max:{}".format(received))
