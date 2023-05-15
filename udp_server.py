@@ -1,5 +1,7 @@
 import socket
 import struct
+import paramiko
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 """
@@ -12,7 +14,8 @@ the default address is 127.0.0.1(localhost) 4010
 
 verbose = True
 
-@dataclass # Python 3.7
+
+@dataclass  # Python 3.7
 class State:
     m_yaw: int = 0
     m_pit: int = 0
@@ -29,9 +32,20 @@ class State:
 
 
 def startServer(local_ip, local_port, buffer_size=2048):
+    print("Connecting to MUGIC_Mindstorms...    -1/2")
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_server_socket.bind((local_ip, local_port))
-    print("MUGIC_Mindstorms UDP server up and listening")
+    print("Done.                                -1/2")
+
+    host = 'ev3dev.local'
+    username = 'robot'
+    password = 'maker'
+
+    print("Connecting to LEGO_ev3dev...         -2/2")
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(host, 22, username, password)
+    print("Done.                                -1/2")
 
     # Listen for incoming datagrams
     while True:
@@ -43,7 +57,10 @@ def startServer(local_ip, local_port, buffer_size=2048):
         data = message[-len(prepend):]
         """
 
-        UpdateState(message)
+        output_message = UpdateState(message)
+        if output_message:
+            stdin, stdout, stderr = ssh.exec_command('python3 ev3dev_connector.py')
+            output = stdout.read().decode('utf-8')
 
 
 def UpdateState(m):
@@ -55,6 +72,7 @@ def UpdateState(m):
             State.jolt_count += 1
             output = "Jolt from Max:{}".format(State.jolt_count)
             State.jolt_switch = False
+            return 1
 
     elif m.startswith(b'spd'):
         State.speed = UDPIntDecode(m)
