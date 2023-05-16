@@ -46,6 +46,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(host, 22, username, password)
     print("Done.                                -1/2")
+    ssh.exec_command("python3 ev3dev_connector.py")
 
     # Listen for incoming datagrams
     while True:
@@ -59,7 +60,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
 
         output_message = UpdateState(message)
         if output_message:
-            stdin, stdout, stderr = ssh.exec_command('python3 ev3dev_connector.py')
+            stdin, stdout, stderr = ssh.exec_command(output_message)
             output = stdout.read().decode('utf-8')
 
 
@@ -72,7 +73,7 @@ def UpdateState(m):
             State.jolt_count += 1
             output = "Jolt from Max:{}".format(State.jolt_count)
             State.jolt_switch = False
-            return 1
+            return "jolt"
 
     elif m.startswith(b'spd'):
         State.speed = UDPIntDecode(m)
