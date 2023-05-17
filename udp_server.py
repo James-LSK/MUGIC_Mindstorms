@@ -12,8 +12,11 @@ In MAX/MSP, use
 the default address is 127.0.0.1(localhost) 4010
 """
 
-verbose = True
-
+# Output flag priority: vSignal > verbose > vMIDI & vQtoE
+verbose = False # Output all readouts
+vMIDI = True # Only output MIDI readouts
+vQtoE = False # Only output QtoE readouts
+vSignal = "NULL" # Type a specific signal you want as output. i.e. "QtoE Pitch"
 
 @dataclass  # Python 3.7
 class State:
@@ -46,6 +49,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(host, 22, username, password)
     print("Done.                                -1/2")
+    ssh.exec_command("python3 ev3dev_connector.py")
 
     # Listen for incoming datagrams
     while True:
@@ -59,7 +63,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
 
         output_message = UpdateState(message)
         if output_message:
-            stdin, stdout, stderr = ssh.exec_command('python3 ev3dev_connector.py')
+            stdin, stdout, stderr = ssh.exec_command(output_message)
             output = stdout.read().decode('utf-8')
 
 
@@ -72,7 +76,7 @@ def UpdateState(m):
             State.jolt_count += 1
             output = "Jolt from Max:{}".format(State.jolt_count)
             State.jolt_switch = False
-            return 1
+            return "jolt"
 
     elif m.startswith(b'spd'):
         State.speed = UDPIntDecode(m)
@@ -130,9 +134,18 @@ def UpdateState(m):
     # else:
         # received = UDPStrDecode(message)
         # print("Unrecognized Message from Max: ", received)
-
-    if verbose and output != "":
-        print(output)
+    if output != "":
+        if output.startswith(vSignal):
+            print(output)
+        elif verbose:
+            print(output)
+        else:
+            if vMIDI and output.startswith("MIDI"):
+                print(output)
+            if vQtoE and output.startswith("QtoE"):
+                print(output)
+            if not output.startswith("MIDI") and not output.startswith("QtoE"):
+                print(output)
 
 
 def UDPIntDecode(i):
