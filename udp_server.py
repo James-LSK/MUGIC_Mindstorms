@@ -9,7 +9,7 @@ In MAX/MSP, use
 the default address is 127.0.0.1(localhost) 4010
 """
 
-
+#priority is to lower latency
 def startServer(local_ip, local_port, buffer_size=2048):
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_server_socket.bind((local_ip, local_port))
