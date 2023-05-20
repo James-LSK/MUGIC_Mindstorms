@@ -6,19 +6,17 @@ from ev3dev.ev3 import *
 print("Initiating")
 
 def getch():
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-    tty.setcbreak(fd)
-    ch = sys.stdin.read(1)
-    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+   fd = sys.stdin.fileno()
+   old_settings = termios.tcgetattr(fd)
+   tty.setcbreak(fd)
+   ch = sys.stdin.read(1)
+   termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
     
-    return ch
+   return ch
 
-def marchaimp():
-   subprocess.call(['python3', 'marchaImperial'])
-
+sound = Sound()
 while True:
    k = getch()
    print(k)
    if k == 'm':
-     marchaimp()
+      sound.speak("Poop")
