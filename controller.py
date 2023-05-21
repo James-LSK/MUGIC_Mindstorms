@@ -2,8 +2,7 @@ import subprocess
 import termios, tty, sys
 from ev3dev.ev3 import *
 
-# Testing
-print("Initiating")
+print("Initiating...")
 
 def getch():
    fd = sys.stdin.fileno()
@@ -14,7 +13,7 @@ def getch():
    
    return ch
 
-verbose = False
+verbose = True
 
 lMotor = LargeMotor('outB')
 rMotor = LargeMotor('outC')
@@ -23,8 +22,14 @@ mRight = False
 mLeft = False
 speed = 0
 
+print("Ready. WASD to move. Space to stop. Q to quit.")
+
 while True:
+   print("Waiting for input")
    input = getch()
+   # input = sys.stdin.read(1)
+   print("Input received")
+   
    if verbose:
       print(input)
    if input == 'w': # Speed up or move forward
