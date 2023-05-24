@@ -51,13 +51,15 @@ scp ev3dev_connector.py robot@ev3dev.local:~
 Again, type in the default password "maker" in the prompt.  
 
 
-### Updating network drivers for 
+### Updating network drivers for Edimax EW-7811Un V2 WiFi dongle
+
+From: ``http://msdl.cs.mcgill.ca/people/rparedis/sources/wifi-dongle-EV3``
 
 1. Download this driver (8188eu.ko).
 2. Replace the driver on the EV3 in the ``/lib/modules/4.14.117-ev3dev-2.3.5-ev3/drivers/net/wireless/`` folder. (Make a backup, just in case!)
 3. Reboot the EV3.
 4. Insert the WiFi-dongle into the device once it has started.
 5. Check that the WiFi-option is still empty.
-6. Execute (on the EV3) sudo modprobe 8188eu.
+6. Execute (on the EV3) ``sudo modprobe 8188eu``.
 7. To automatically enable it on startup, add ``8188eu`` to ``/etc/modules``.
 8. The WiFi should now be available on the EV3-brick. Use either the UI or the commandline to connect to a network
