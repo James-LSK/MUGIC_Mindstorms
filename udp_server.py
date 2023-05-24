@@ -52,10 +52,10 @@ def startServer(local_ip, local_port, buffer_size=2048):
     print("Done.                                -1/2")
     # ssh.exec_command("python3 ev3dev_connector.py")
     stdin, stdout, stderr = ssh.exec_command("python3 controller.py", get_pty = True)
-    stdout.read().decode('utf-8')
+    # stdout.read().decode('utf-8')
     print("===============\nSSH stdout\n===============")
-    # for line in ssh_stdout:
-    #     print(line)
+    for line in stdout:
+        print(line)
 
     # transport = ssh.get_transport()
     # session = transport.open_session()
@@ -88,28 +88,28 @@ def startServer(local_ip, local_port, buffer_size=2048):
             forward = True
             speed += 1
             activityQueue.append('w')
-            # print("Forward " + str(speed))
+            print("Forward " + str(speed))
         if not reverse and speed > -5 and State.m_pit > 96:
             reverse = True
             speed -= 1
             activityQueue.append('s')
-            # print("Reverse " + str(speed))
+            print("Reverse " + str(speed))
         if not left and State.m_rot > 96:
-            # print("Left")
+            print("Left")
             left = True
             activityQueue.append('a')
         if not right and State.m_rot < 32:
-            # print("Right")
+            print("Right")
             right = True
             activityQueue.append('d')
         if (forward or reverse) and State.m_pit > 32 and State.m_pit < 96:
-            # print("Halt")
+            print("Halt")
             if forward:
                 forward = False
             if reverse:
                 reverse = False
         if (left or right) and State.m_rot > 32 and State.m_rot < 96:
-            # print("Straight")
+            print("Straight")
             if left:
                 left = False
             if right:
@@ -119,6 +119,8 @@ def startServer(local_ip, local_port, buffer_size=2048):
             # stdout.read().decode('utf-8')
             cmd = activityQueue.pop(0)
             print(cmd)
+            # ssh.exec_command(cmd)
+            print("command sent")
             stdin.write(cmd + '\n')
             stdin.flush()
             # session.send(cmd)
