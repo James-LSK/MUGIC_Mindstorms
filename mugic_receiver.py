@@ -7,7 +7,7 @@ In MAX/MSP, use
 
    source out --- prepend [id] --- udpsend [ip] [port]
     
-the default address is 127.0.0.1(localhost) 4010
+the default address is 127.0.0.1(localhost) 4090
 """
 
 # Output flag priority: vSignal > verbose > vMIDI & vQtoE
@@ -15,6 +15,8 @@ verbose = False # Output all readouts
 vMIDI = False # Only output MIDI readouts
 vQtoE = False # Only output QtoE readouts
 vSignal = "NULL" # Type a specific signal you want as output. i.e. "QtoE Pitch"
+
+TOP_SPEED = 10
 
 class MugicState():
    def __init__(self):
@@ -98,17 +100,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
          if right:
                right = False
       if len(activityQueue) > 0:
-         # continue
-         # print(activityQueue.pop(0))
          exec(activityQueue.pop(0))        
-
-def UDPIntDecode(i):
-    # Assumes 4 byte unsigned integer
-    return struct.unpack('!I', i[-4:])[0]
-
-def UDPStrDecode(s):
-    # Decode regular str messages
-    return s.decode('utf-8')
 
 def UpdateState(m):
     output = ""
@@ -119,7 +111,6 @@ def UpdateState(m):
             M1.jolt_count += 1
             output = "Jolt from Max:{}".format(M1.jolt_count)
             M1.jolt_switch = False
-            return "jolt"
 
     elif m.startswith(b'spd'):
         M1.speed = UDPIntDecode(m)
@@ -200,7 +191,7 @@ def exec(cmd):
       if E1.speed < 0:
          E1.speed = 0
       else:
-         E1.speed = 2
+         E1.speed = TOP_SPEED
       E1.lMotor.run_forever(speed_sp = E1.speed * 90)
       E1.rMotor.run_forever(speed_sp = E1.speed * 90)
       E1.mLeft = False
@@ -211,7 +202,7 @@ def exec(cmd):
       if E1.speed > 0:
          E1.speed = 0
       else:
-         E1.speed = -2
+         E1.speed = TOP_SPEED * -1
       E1.lMotor.run_forever(speed_sp = E1.speed * 90)
       E1.rMotor.run_forever(speed_sp = E1.speed * 90)
       E1.mLeft = False
@@ -253,6 +244,14 @@ def exec(cmd):
       E1.speed = 0
       E1.lMotor.run_forever(speed_sp = E1.speed)
       E1.rMotor.run_forever(speed_sp = E1.speed)
+
+def UDPIntDecode(i):
+    # Assumes 4 byte unsigned integer
+    return struct.unpack('!I', i[-4:])[0]
+
+def UDPStrDecode(s):
+    # Decode regular str messages
+    return s.decode('utf-8')
 
 if __name__ == "__main__":
    hostname = socket.gethostname()
