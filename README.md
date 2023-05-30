@@ -6,12 +6,7 @@ Control your LEGO EV3 Mindstorm unit with the MUGIC motion sensor!
 More about MUGIC here: https://mugicmotion.com/
 
 Project Team Members:
-James Kim
-Warren Ma
-Kelton Lindsey
-Bolun Ruan
-Yiyang Li
-Iyad Hassan
+James Kim, Warren Ma, Kelton Lindsey, Bolun Ruan, Yiyang Li, Iyad Hassan
 
 ## Instructions
 1. Install MAX: https://cycling74.com/downloads
