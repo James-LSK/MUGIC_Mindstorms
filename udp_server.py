@@ -45,17 +45,17 @@ def startServer(local_ip, local_port, buffer_size=2048):
     username = 'robot'
     password = 'maker'
 
-    print("Connecting to LEGO_ev3dev...         -2/2")
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host, 22, username = username, password = password)
-    print("Done.                                -1/2")
+    #print("Connecting to LEGO_ev3dev...         -2/2")
+    #ssh = paramiko.SSHClient()
+    #ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    #ssh.connect(host, 22, username = username, password = password)
+    #print("Done.                                -1/2")
     # ssh.exec_command("python3 ev3dev_connector.py")
-    stdin, stdout, stderr = ssh.exec_command("python3 controller.py", get_pty = True)
+    #stdin, stdout, stderr = ssh.exec_command("python3 controller.py", get_pty = True)
     # stdout.read().decode('utf-8')
-    print("===============\nSSH stdout\n===============")
-    for line in stdout:
-        print(line)
+    #print("===============\nSSH stdout\n===============")
+    #for line in stdout:
+       # print(line)
 
     # transport = ssh.get_transport()
     # session = transport.open_session()
