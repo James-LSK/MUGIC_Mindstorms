@@ -1,8 +1,6 @@
 # MUGIC Mindstorm
 UCI IN4MATX 117 MUGIC TEAM
 
-Control your LEGO EV3 Mindstorm unit with the MUGIC motion sensor!
-
 More about MUGIC here: https://mugicmotion.com/
 
 Project Team Members:
@@ -10,7 +8,7 @@ James Kim, Warren Ma, Kelton Lindsey, Bolun Ruan, Yiyang Li, Iyad Hassan
 
 ## Instructions
 1. Install MAX: https://cycling74.com/downloads
-2. Download and run MUGIC_Connect 1.5.0: https://mugicmotion.com/free-tryouts
+2. Download and run ``MUGIC_Connect_1.5.0.maxproj`` (provided in this repository. Credit: Mari Kimura)
 3. Run ``MUGIC_Starter.maxproj`` (provided in this repository. Credit: Mari Kimura)
 4. Connect your MUGIC unit to your computer. Tutorials here: https://mugicmotion.com/instruction-videos
 5. Connect your EV3 unit to the same network
