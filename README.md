@@ -6,11 +6,16 @@ Control your LEGO EV3 Mindstorm unit with the MUGIC motion sensor!
 More about MUGIC here: https://mugicmotion.com/
 
 ## Instructions
+### Setting Up MUGIC
 1. Install MAX: https://cycling74.com/downloads
 2. Download and run MUGIC_Connect 1.5.0: https://mugicmotion.com/free-tryouts
 3. Run ``MUGIC_Starter.maxproj`` (provided in this repository. Credit: Mari Kimura)
 4. Connect your MUGIC unit to your computer. Tutorials here: https://mugicmotion.com/instruction-videos
-5. Connect your EV3 unit to the same network
+
+### Setting Up LEGO EV3 Mindstorms
+1. Download and flash the EV3Dev disk image onto your micro SD card. Image file and instructions here: https://www.ev3dev.org/docs/getting-started/#step-1-download-the-latest-ev3dev-image-file
+2. Inser the SD card into the EV3 unit and turn it on
+2. Connect your EV3 unit to the same network either through WIFI (instructions below) or a USB cable
 6. Move ``mugic_receiver.py`` to the EV3
 7. Run ``remote_start.py``
 
@@ -29,7 +34,7 @@ On the ``MUGIC_Starter.maxproj`` window, click on the yellow presentation button
 According to https://www.ev3dev.org/docs/networking/, there are 3 supported Wifi dongles:
 
 1. NetGear WNA1100 Wireless-N 150 (officially supported by LEGO’s software)
-2. Edimax EW-7811Un 802.11n Wireless Adapter (officially supported by LEGO’s software. Requires network driver update)
+2. Edimax EW-7811Un 802.11n Wireless Adapter (officially supported by LEGO’s software. Requires network driver update. Instructions below)
 3. EP-N8508GS 150Mbps Mini Wireless 802.11N USB Adapter (not officially supported by LEGO, but also works)
 
 ### Updating network drivers for Edimax EW-7811Un V2 WiFi dongle
