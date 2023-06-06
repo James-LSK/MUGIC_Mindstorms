@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 34.0, 82.0, 1553.0, 931.0 ],
+		"rect" : [ 844.0, 82.0, 741.0, 924.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 1,
 		"default_fontsize" : 12.0,
@@ -152,8 +152,8 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 419.519527152299133, 902.243047886297745, 151.0, 22.0 ],
-					"text" : "udpsend 192.168.4.3 4090"
+					"patching_rect" : [ 419.519527152299133, 902.243047886297745, 138.0, 22.0 ],
+					"text" : "udpsend 127.0.0.1 4010"
 				}
 
 			}
@@ -1303,7 +1303,7 @@
 ,
 		"dependency_cache" : [ 			{
 				"name" : "MUGIC_Devices.maxpat",
-				"bootpath" : "~/repos/MUGIC_Mindstorms/MUGIC_Starter/patchers",
+				"bootpath" : "~/OneDrive/Documents/Max 8/Packages/MUGIC_Starter/patchers",
 				"patcherrelativepath" : ".",
 				"type" : "JSON",
 				"implicit" : 1
