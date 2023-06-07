@@ -1,22 +1,13 @@
-import struct
 import socket
-from ev3dev.ev3 import *
+import paramiko
 
 """
-In MAX/MSP, use
+To be run on the computer
 
-   source out --- prepend [id] --- udpsend [ip] [port]
-    
+Receives signals from MAX and sends commands to EV3
+
 the default address is 127.0.0.1(localhost) 4090
 """
-
-# Output flag priority: vSignal > verbose > vMIDI & vQtoE
-verbose = False # Output all readouts
-vMIDI = False # Only output MIDI readouts
-vQtoE = False # Only output QtoE readouts
-vSignal = "NULL" # Type a specific signal you want as output. i.e. "QtoE Pitch"
-
-TOP_SPEED = 10
 
 class MugicState():
    def __init__(self):
@@ -33,18 +24,7 @@ class MugicState():
       self.steady = 0
       self.lr = False # LeftRight ?
 
-class EV3State():
-   def __init__(self):
-      self.lMotor = LargeMotor('outB')
-      self.rMotor = LargeMotor('outC')
-      self.sound = Sound()
-      self.mRight = False
-      self.mLeft = False
-      self.speed = 0
-
-
 M1 = MugicState()
-E1 = EV3State()
 
 def startServer(local_ip, local_port, buffer_size=2048):
    print("Connecting to MUGIC...")
@@ -182,83 +162,37 @@ def UpdateState(m):
             if not output.startswith("MIDI") and not output.startswith("QtoE"):
                 print(output)
 
-def exec(cmd):
-   if verbose:
-      print(cmd)
-   if cmd == 'w': # Speed up or move forward
-      # if E1.speed < 5:
-      #    E1.speed += 1
-      if E1.speed < 0:
-         E1.speed = 0
-      else:
-         E1.speed = TOP_SPEED
-      E1.lMotor.run_forever(speed_sp = E1.speed * 90)
-      E1.rMotor.run_forever(speed_sp = E1.speed * 90)
-      E1.mLeft = False
-      E1.mRight = False
-   elif cmd == 's': # Slow down or reverse
-      # if E1.speed > -5:
-      #    E1.speed -= 1
-      if E1.speed > 0:
-         E1.speed = 0
-      else:
-         E1.speed = TOP_SPEED * -1
-      E1.lMotor.run_forever(speed_sp = E1.speed * 90)
-      E1.rMotor.run_forever(speed_sp = E1.speed * 90)
-      E1.mLeft = False
-      E1.mRight = False
+def sendUDP(ip_address, port, message):
+    # Create a UDP socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    
+    try:
+        sock.sendto(message.encode(), (ip_address, port))
+        print("UDP signal sent successfully!")
+    except socket.error as err:
+        print("Failed to send UDP signal:", str(err))
+    finally:
+        sock.close()
 
-   elif cmd == 'a': # Turn left
-      if E1.mRight:
-         E1.lMotor.run_forever(speed_sp = E1.speed * 90)
-         E1.rMotor.run_forever(speed_sp = E1.speed * 90)
-         E1.mRight = False
-      else:
-         if E1.speed > 0:
-            E1.lMotor.run_forever(speed_sp = (E1.speed - 1) * 90)
-         elif E1.speed < 0:
-            E1.lMotor.run_forever(speed_sp = (E1.speed + 1) * 90)
-         else:
-            E1.lMotor.run_forever(speed_sp = -90)
-            E1.rMotor.run_forever(speed_sp = 90)
-         E1.mLeft = True
-   elif cmd == 'd': # Turn right
-      if E1.mLeft:
-         E1.lMotor.run_forever(speed_sp = E1.speed * 90)
-         E1.rMotor.run_forever(speed_sp = E1.speed * 90)
-         E1.mLeft = False
-      else:
-         if E1.speed > 0:
-            E1.rMotor.run_forever(speed_sp = (E1.speed - 1) * 90)
-         elif E1.speed < 0:
-            E1.rMotor.run_forever(speed_sp = (E1.speed + 1) * 90)
-         else:
-            E1.rMotor.run_forever(speed_sp = -90)
-            E1.lMotor.run_forever(speed_sp = 90)
-         E1.mRight = True
-   elif cmd == ' ': # Stop
-      E1.speed = 0
-      E1.lMotor.run_forever(speed_sp = E1.speed)
-      E1.rMotor.run_forever(speed_sp = E1.speed)
-   elif cmd == 'q': # Quit
-      E1.speed = 0
-      E1.lMotor.run_forever(speed_sp = E1.speed)
-      E1.rMotor.run_forever(speed_sp = E1.speed)
+def sendFile(ip_address, port, username, password, local_file_path, remote_file_path):
+    client = paramiko.SSHClient()
 
-def UDPIntDecode(i):
-    # Assumes 4 byte unsigned integer
-    return struct.unpack('!I', i[-4:])[0]
+    try:
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(ip_address, port, username, password)
+        sftp = client.open_sftp()
+        sftp.put(local_file_path, remote_file_path)
+        print("File sent successfully via SFTP!")
+    except paramiko.AuthenticationException:
+        print("Authentication failed. Please check your credentials.")
+    except paramiko.SSHException as err:
+        print("SSH connection error:", str(err))
+    except paramiko.sftp.SFTPError as err:
+        print("SFTP error:", str(err))
+    finally:
+        sftp.close()
+        client.close()
 
-def UDPStrDecode(s):
-    # Decode regular str messages
-    return s.decode('utf-8')
+target_ip = input("Enter the EV3 local IP address: ")
+target_port = int(input("Enter the EV3 port: "))
 
-if __name__ == "__main__":
-   hostname = socket.gethostname()
-   localIP = socket.gethostbyname(hostname)
-   print("Your Computer Name is:" + hostname)
-   print("Your Computer IP Address is:" + localIP)
-
-   localPort = 4090
-
-   startServer(localIP, localPort)
