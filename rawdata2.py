@@ -17,10 +17,10 @@ class State:
         self.steady = 0
         self.lr = False
 
-motion_data = []
+gesture_data = []
 
 def startServer(local_ip, local_port, buffer_size=2048):
-    global motion_data
+    global gesture_data
     print("Connecting to MUGIC_Mindstorms...    -1/2")
     udp_server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_server_socket.bind((local_ip, local_port))
@@ -28,7 +28,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
 
     # Prepare motion data for a specific gesture
     state = State()
-        
+
     # Listen for incoming datagrams
     while True:
         bytes_address_pair = udp_server_socket.recvfrom(buffer_size)
@@ -36,10 +36,9 @@ def startServer(local_ip, local_port, buffer_size=2048):
 
         # Process motion data
         update_state(message, state)
-        
-        # Store motion data for the specific gesture
-        motion_data.append(state_to_dict(state))
 
+        # Store motion data for the specific gesture
+        gesture_data.append(state_to_dict(state))
 
 def update_state(m, state):
     if m.startswith(b'jolt'):
@@ -51,10 +50,10 @@ def update_state(m, state):
 
     elif m.startswith(b'spd'):
         state.speed = udp_int_decode(m)
-    
+
     elif m.startswith(b'nrg'):
         state.energy = udp_int_decode(m)
-    
+
     elif m.startswith(b'std'):
         temp = int(udp_int_decode(m) / 1000)
         if state.steady != temp:
@@ -90,10 +89,8 @@ def update_state(m, state):
         if state.qe_rot != temp:
             state.qe_rot = temp
 
-
 def udp_int_decode(i):
     return struct.unpack('!I', i[-4:])[0]
-
 
 def state_to_dict(state):
     return {
@@ -111,12 +108,10 @@ def state_to_dict(state):
         "lr": state.lr
     }
 
-
 def save_data_to_file(data, file_path):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=4)
         print("Motion data saved to file:", file_path)
-
 
 if __name__ == "__main__":
     localIP = "127.0.0.1"
@@ -126,4 +121,15 @@ if __name__ == "__main__":
     try:
         startServer(localIP, localPort)
     except KeyboardInterrupt:
-        save_data_to_file(motion_data, output_file)
+        # Load existing gestures from the JSON file
+        try:
+            with open(output_file, 'r') as file:
+                existing_data = json.load(file)
+        except FileNotFoundError:
+            existing_data = []
+
+        # Append new gestures to the existing data
+        existing_data.extend(gesture_data)
+
+        # Save the updated data to the JSON file
+        save_data_to_file(existing_data, output_file)
