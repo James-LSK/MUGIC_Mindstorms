@@ -7,18 +7,18 @@ from keras.layers import LSTM, Dense
 from keras.utils import np_utils
 
 # Step 4: Load the JSON data
-gesture_data_file = "motion_data.json"
+gesture_data_file = "gesture_data.json"
 with open(gesture_data_file, 'r') as file:
     gesture_data = json.load(file)
 
 # Step 5: Prepare the input and output sequences
 X = []
 y = []
-for sample in gesture_data:
-    features = [sample['m_yaw'], sample['m_pit'], sample['m_rot'], sample['qe_yaw'], sample['qe_pit'], sample['qe_rot'], sample['jolt_count'], sample['jolt_switch'], sample['speed'], sample['energy'], sample['steady'], sample['lr']]
-    label = sample['label']  # Replace 'label' with the appropriate key in your JSON data
-    X.append(features)
-    y.append(label)
+for gesture_label, gesture_samples in gesture_data.items():
+    for sample in gesture_samples:
+        features = [sample['m_yaw'], sample['m_pit'], sample['m_rot'], sample['qe_yaw'], sample['qe_pit'], sample['qe_rot'], sample['jolt_count'], sample['jolt_switch'], sample['speed'], sample['energy'], sample['steady'], sample['lr']]
+        X.append(features)
+        y.append(gesture_label)
 
 # Step 6: Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
