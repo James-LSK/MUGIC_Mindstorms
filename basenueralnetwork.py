@@ -73,4 +73,6 @@ X_new = np.array(X_new)
 predictions = model.predict(X_new)
 
 # Step 13: Decode the predictions to obtain the predicted labels
-predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1
+predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1))
+
+print(predicted_labels)
