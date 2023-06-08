@@ -91,7 +91,7 @@ def update_state(m, state):
             state.qe_rot = temp
 
 
-def UDPIntDecode(i):
+def udp_int_decode(i):
     # Assumes 4 byte unsigned integer
     return struct.unpack('!I', i[-4:])[0]
 
