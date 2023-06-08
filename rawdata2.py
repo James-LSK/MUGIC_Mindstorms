@@ -145,4 +145,3 @@ if __name__ == "__main__":
         with open(output_file, 'w') as file:
             json.dump(existing_data, file, indent=4)
             print("Gesture data saved to file:", output_file)
-
