@@ -91,8 +91,14 @@ def update_state(m, state):
             state.qe_rot = temp
 
 
-def udp_int_decode(i):
+def UDPIntDecode(i):
+    # Assumes 4 byte unsigned integer
     return struct.unpack('!I', i[-4:])[0]
+
+
+def UDPStrDecode(s):
+    # Decode regular str messages
+    return s.decode('utf-8')
 
 
 def state_to_dict(state):
