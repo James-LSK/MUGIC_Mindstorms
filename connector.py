@@ -1,3 +1,4 @@
+import struct
 import socket
 import paramiko
 
@@ -8,6 +9,14 @@ Receives signals from MAX and sends commands to EV3
 
 the default address is 127.0.0.1(localhost) 4090
 """
+
+# Output flag priority: vSignal > verbose > vMIDI & vQtoE
+verbose = False # Output all readouts
+vMIDI = False # Only output MIDI readouts
+vQtoE = False # Only output QtoE readouts
+vSignal = "NULL" # Type a specific signal you want as output. i.e. "QtoE Pitch"
+
+TOP_SPEED = 10
 
 class MugicState():
    def __init__(self):
@@ -25,6 +34,7 @@ class MugicState():
       self.lr = False # LeftRight ?
 
 M1 = MugicState()
+speed = 0
 
 def startServer(local_ip, local_port, buffer_size=2048):
    print("Connecting to MUGIC...")
@@ -47,16 +57,16 @@ def startServer(local_ip, local_port, buffer_size=2048):
       data = message[-len(prepend):]
       """
       UpdateState(message)
-      if not forward and E1.speed < 5 and M1.m_pit < 32:
+      if not forward and speed < 5 and M1.m_pit < 32:
          forward = True
          # activityQueue.append('w')
          exec('w')
-         print("Forward " + str(E1.speed))
-      if not reverse and E1.speed > -5 and M1.m_pit > 96:
+         print("Forward " + str(speed))
+      if not reverse and speed > -5 and M1.m_pit > 96:
          reverse = True
          # activityQueue.append('s')
          exec('s')
-         print("Reverse " + str(E1.speed))
+         print("Reverse " + str(speed))
       if not left and M1.m_rot > 96:
          print("Left")
          left = True
@@ -80,7 +90,7 @@ def startServer(local_ip, local_port, buffer_size=2048):
          if right:
                right = False
       if len(activityQueue) > 0:
-         exec(activityQueue.pop(0))        
+         sendUDP(target_ip, target_port, activityQueue.pop(0))        
 
 def UpdateState(m):
     output = ""
@@ -192,7 +202,10 @@ def sendFile(ip_address, port, username, password, local_file_path, remote_file_
     finally:
         sftp.close()
         client.close()
+        
+def UDPIntDecode(i):
+    # Assumes 4 byte unsigned integer
+    return struct.unpack('!I', i[-4:])[0]
 
 target_ip = input("Enter the EV3 local IP address: ")
 target_port = int(input("Enter the EV3 port: "))
-
