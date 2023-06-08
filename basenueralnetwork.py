@@ -43,16 +43,12 @@ X_train_reshaped = np.reshape(X_train_array, (X_train_array.shape[0], X_train_ar
 model = Sequential()
 model.add(LSTM(5, input_shape=(X_train_reshaped.shape[1], 1)))
 model.add(Dense(num_classes, activation='softmax'))
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='categorical_crossentropy', optimizer='adagrad', metrics=['accuracy'])
 
 # Step 6: Train the RNN model
-batch_size = 32
+batch_size = 16
 epochs = 10
 model.fit(X_train_reshaped, y_train_encoded, batch_size=batch_size, epochs=epochs)
-
-# Convert the X_test variable to a NumPy array and reshape it
-X_test_array = np.array(X_test)
-X_test_reshaped = np.reshape(X_test_array, (X_test_array.shape[0], X_test_array.shape[1], 1))
 
 # Step 7: Evaluate the RNN model
 _, accuracy = model.evaluate(X_test_reshaped, y_test_encoded, verbose=0)
