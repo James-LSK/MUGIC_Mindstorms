@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from keras.models import Sequential, load_model
 from keras.layers import LSTM, Dense
-from keras.utils import np_utils
+from keras.utils import to_categorical
 
 # Step 1: Load the JSON data
 gesture_data_file = "gesture_data.json"
@@ -14,12 +14,11 @@ with open(gesture_data_file, 'r') as file:
 # Step 2: Prepare the input and output sequences
 X = []
 y = []
-for gesture in gesture_data:
-    label = gesture["label"]
-    for sample in gesture["data"]:
+for gesture_label, gesture_samples in gesture_data.items():
+    for sample in gesture_samples:
         features = [sample['m_yaw'], sample['m_pit'], sample['m_rot'], sample['qe_yaw'], sample['qe_pit'], sample['qe_rot'], sample['jolt_count'], sample['jolt_switch'], sample['speed'], sample['energy'], sample['steady'], sample['lr']]
         X.append(features)
-        y.append(label)
+        y.append(gesture_label)
 
 # Step 3: Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
