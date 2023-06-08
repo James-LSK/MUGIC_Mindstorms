@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import tensorflow
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from keras.models import Sequential, load_model
@@ -25,28 +26,36 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Step 4: Preprocess the data
 label_encoder = LabelEncoder()
-y_train_encoded = label_encoder.fit_transform(y_train)
-y_test_encoded = label_encoder.transform(y_test)
+
+# One-hot encode the labels
+y_train_encoded = to_categorical(label_encoder.fit_transform(y_train))
+y_test_encoded = to_categorical(label_encoder.transform(y_test))
+
 num_classes = len(label_encoder.classes_)
-X_train = np.array(X_train)
-X_test = np.array(X_test)
-y_train_encoded = np_utils.to_categorical(y_train_encoded, num_classes)
-y_test_encoded = np_utils.to_categorical(y_test_encoded, num_classes)
+
+# Convert the X_train variable to a NumPy array
+X_train_array = np.array(X_train)
+
+# Reshape the X_train_array variable to have 3 dimensions
+X_train_reshaped = np.reshape(X_train_array, (X_train_array.shape[0], X_train_array.shape[1], 1))
 
 # Step 5: Define the RNN architecture (LSTM)
-input_shape = (X_train.shape[1],)
 model = Sequential()
-model.add(LSTM(128, input_shape=input_shape))
+model.add(LSTM(5, input_shape=(X_train_reshaped.shape[1], 1)))
 model.add(Dense(num_classes, activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Step 6: Train the RNN model
 batch_size = 32
 epochs = 10
-model.fit(X_train, y_train_encoded, batch_size=batch_size, epochs=epochs, validation_data=(X_test, y_test_encoded))
+model.fit(X_train_reshaped, y_train_encoded, batch_size=batch_size, epochs=epochs)
+
+# Convert the X_test variable to a NumPy array and reshape it
+X_test_array = np.array(X_test)
+X_test_reshaped = np.reshape(X_test_array, (X_test_array.shape[0], X_test_array.shape[1], 1))
 
 # Step 7: Evaluate the RNN model
-_, accuracy = model.evaluate(X_test, y_test_encoded, verbose=0)
+_, accuracy = model.evaluate(X_test_reshaped, y_test_encoded, verbose=0)
 print("Accuracy: {:.2f}%".format(accuracy * 100))
 
 # Step 8: Save the trained model
@@ -71,7 +80,7 @@ X_new = np.array(X_new)
 # Step 12: Use the model to predict labels for the new data
 predictions = model.predict(X_new)
 
-# Step 13: Decode the predictions to obtain the predicted labels
+# Decode the predictions to obtain the predicted labels
 predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1))
 
 print(predicted_labels)
