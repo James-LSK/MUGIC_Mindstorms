@@ -57,7 +57,7 @@ model.save("trained_model.h5")
 model = load_model("trained_model.h5")
 
 # Step 10: Load the new data
-new_data_file = "new_data.json"
+new_data_file = "motion_data.json"
 with open(new_data_file, 'r') as file:
     new_data = json.load(file)
 
