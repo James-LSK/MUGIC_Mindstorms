@@ -7,7 +7,7 @@ from keras.layers import LSTM, Dense
 from keras.utils import np_utils
 
 # Step 1: Load the JSON data
-gesture_data_file = "motion_data.json"
+gesture_data_file = "gesture_data.json"
 with open(gesture_data_file, 'r') as file:
     gesture_data = json.load(file)
 
